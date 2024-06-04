@@ -20,8 +20,8 @@ VMIN = 0.2
 def simulate(filename):
     obstacles = create_obstacles(SIM_TIME, NUMBER_OF_TIMESTEPS)
 
-    start = np.array([5, 0, 0, 0])
-    goal = np.array([5, 10, 0, 0])
+    start = np.array([5, 5, 0, 0])
+    goal = np.array([5, 5, 0, 0])
 
     robot_state = start
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
@@ -32,8 +32,22 @@ def simulate(filename):
         robot_state = update_state(robot_state, control_vel)
         robot_state_history[:4, i] = robot_state
 
+    start2 = np.array([5, 0, 0, 0])
+    goal2 = np.array([6, 7, 0, 0])
+
+    robot_state2 = start2
+    robot_state_history2 = np.empty((4, NUMBER_OF_TIMESTEPS))
+    for i in range(NUMBER_OF_TIMESTEPS):
+        v_desired2 = compute_desired_velocity(robot_state2, goal2, ROBOT_RADIUS, VMAX)
+        control_vel2 = compute_velocity(
+            robot_state2, obstacles[:, i, :], v_desired2)
+        robot_state2 = update_state(robot_state2, control_vel2)
+        robot_state_history2[:4, i] = robot_state2    
+
     plot_robot_and_obstacles(
-        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
+        robot_state_history, robot_state_history2, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
+    
+    #plot_robot_and_obstacles(robot_state_history2, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
 
 
 def compute_velocity(robot, obstacles, v_desired):

@@ -10,15 +10,19 @@ from matplotlib.patches import Circle
 import numpy as np
 
 
-def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time, filename):
+def plot_robot_and_obstacles(robot, robot2, obstacles, robot_radius, num_steps, sim_time, filename):
     fig = plt.figure()
     ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, 10), ylim=(0, 10))
     ax.set_aspect('equal')
     ax.grid()
     line, = ax.plot([], [], '--r')
+    line2, = ax.plot([], [], '--r')
 
     robot_patch = Circle((robot[0, 0], robot[1, 0]),
                          robot_radius, facecolor='green', edgecolor='black')
+    robot_patch2 = Circle((robot2[0, 0], robot2[1, 0]),
+                         robot_radius, facecolor='blue', edgecolor='black')
+
     obstacle_list = []
     for obstacle in range(np.shape(obstacles)[2]):
         obstacle = Circle((0, 0), robot_radius,
@@ -27,17 +31,21 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time
 
     def init():
         ax.add_patch(robot_patch)
+        ax.add_patch(robot_patch2)
         for obstacle in obstacle_list:
             ax.add_patch(obstacle)
         line.set_data([], [])
-        return [robot_patch] + [line] + obstacle_list
+        line2.set_data([], [])
+        return [robot_patch] + [robot_patch2] + [line] + [line2] + obstacle_list
 
     def animate(i):
         robot_patch.center = (robot[0, i], robot[1, i])
+        robot_patch2.center = (robot2[0, i], robot2[1, i])
         for j in range(len(obstacle_list)):
             obstacle_list[j].center = (obstacles[0, i, j], obstacles[1, i, j])
         line.set_data(robot[0, :i], robot[1, :i])
-        return [robot_patch] + [line] + obstacle_list
+        line2.set_data(robot2[0, :i], robot2[1, :i])
+        return [robot_patch] + [robot_patch2] + [line] + [line2] + obstacle_list
 
     init()
     step = (sim_time / num_steps)
